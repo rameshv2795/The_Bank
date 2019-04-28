@@ -51,7 +51,7 @@ body {font-size:16px;}
   <!-- Packages / Pricing Tables -->
 
   <div class="w3-container" id="packages" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Accounts</b></h1>
+    <h1 id="totalBalance" onloadedmetadata=""class="w3-xxxlarge w3-text-red"><b>Total Balance: </b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
   </div>
 
@@ -142,42 +142,49 @@ function onClick(element) {
   captionText.innerHTML = element.alt;
 }
 
-$('.w3-jumbo').html('<b>Welcome '+ cookieParse[1].split('=')[1] + '!</b>');
+$('.w3-jumbo').empty().append('<b>Welcome '+ cookieParse[1].split('=')[1] + '!</b>');
 
 function getAccounts(){
   $.ajax({
       url: "getAccounts",
       type: "GET",
       success: function(data){
+        var totalAmount = 0;
+
         for(var i = 0; i < data.length; i++){
           var amount = data[i].amount.toLocaleString('en-IN', { maximumSignificantDigits: 3 });
+          var accountColor = 'dark-grey';
+          var accountType = "Checking";
 
+          totalAmount = totalAmount + data[i].amount;
+          console.log(totalAmount);
           /*format number with commas*/
 
           console.log(data[i].amount);
-          if(data[i].name == "checking"){
-            $('.w3-row-padding').append(
-              '<div class="w3-half w3-margin-bottom">' +
-                '<ul class="w3-ul w3-light-grey w3-center">' +
-                '  <li class="w3-dark-grey w3-xlarge w3-padding-32">Checking: $'+amount+'</li>'+
-                  '<li class="w3-padding-16">Floorplanning</li>' +
-                '  <li class="w3-padding-16">10 hours support</li>' +
-                '  <li class="w3-padding-16">Photography</li>' +
-                '  <li class="w3-padding-16">' +
-                '    <h2>$ 199</h2> '+
-                '    <span class="w3-opacity">per room</span>' +
-              '    </li>' +
-              '    <li class="w3-light-grey w3-padding-24">' +
-              '      <button class="w3-button w3-white w3-padding-large w3-hover-black">Detailed View</button> ' +
-                '  </li>' +
-              '  </ul>' +
-            '  </div>'
-            );
+          if(data[i].name == "saving"){
+            accountColor = 'red';
+            accountType = 'Savings';
+          }
+          $('.w3-row-padding').append(
+            '<div class="w3-half w3-margin-bottom">' +
+              '<ul class="w3-ul w3-light-grey w3-center">' +
+              '  <li class="w3-'+ accountColor +' w3-xlarge w3-padding-32">'+accountType+': $'+amount+'</li>'+
+                '<li class="w3-padding-16"> 9932 deposit <span style="color:green">  +  $43 </span></li>' +
+              '  <li class="w3-padding-16"> kvi3 deposit <span style="color:green">  +  $283 </span> </li>' +
+              '  <li class="w3-padding-16"> xdia transfe <span style="color:purple">  -  $2 </span> </li>' +
+              '  <li class="w3-padding-16">' +
+              '    <h2 style="color:green">$324</h2> '+
+              '    <span class="w3-opacity">this month</span>' +
+            '    </li>' +
+            '    <li class="w3-light-grey w3-padding-24">' +
+            '      <button class="w3-button w3-white w3-padding-large w3-hover-black">Detailed View</button> ' +
+              '  </li>' +
+            '  </ul>' +
+          '  </div>'
+          );
         }
 
-
-
-        }
+        $('#totalBalance').empty().append('<b> Total Balance: $'+totalAmount.toLocaleString('en-IN', { maximumSignificantDigits: 3 })+'</b>')
       },
       error: function(error){
         alert(error);

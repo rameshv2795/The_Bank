@@ -1,18 +1,16 @@
-const http = require('http');
-const url = require('url');
-var contentMap = require('./contentMap');
-var show = require('./show');
+var express = require('express');
+var app = express();
+var router = require('./show.js');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
-const onRequest = (request, response) => {
-  var pathName = url.parse(request.url).pathname;
-  show.showPage(response, pathName);
-}
+//To parse URL encoded data (tutorialspoint.com)
+app.use(bodyParser.urlencoded({ extended: false }))
+//To parse json data (tutorialspoint.com)
+app.use(bodyParser.json())
 
-const server = http.createServer(onRequest);
+app.use(cookieParser());
 
-server.listen(8080, (err) => {
-  if (err) {
-    return console.log('Error: ', err)
-  }
-  console.log('Listening on 8080');
-});
+app.use('/thebank', router);
+
+app.listen(8080);

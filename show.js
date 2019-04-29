@@ -2,14 +2,8 @@ var contentMap = require('./contentMap');
 var express = require('express');
 var router = express.Router();
 var path = require('path');
-var mysql = require('mysql');
+var con = require('./config/db.js');
 
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "jeffjack",
-  database: "thebank"
-});
 
 con.connect(function(err) {
   if (err) throw err;
@@ -46,7 +40,7 @@ router.use('/home', function(req, res, next){
     var username = req.body.username;
     var password = req.body.password;
 
-    var query = "SELECT COUNT(idUser) AS exist, username, password, firstName FROM users";
+    var query = "SELECT COUNT(idUser) AS exist, username, password, firstName, iduser FROM users";
     query = query + " WHERE username = '"+username + "' AND password = '" + password + "'";
 
     con.query(query,
@@ -56,9 +50,11 @@ router.use('/home', function(req, res, next){
         }
         if(result[0].exist !== 0){
           console.log('login success');
+          req.session.user = result[0].iduser;
           res.cookie('username', result[0].username);
           res.cookie('firstName', result[0].firstName);
-          next();
+          console.log('HERE');
+          res.sendFile(path.join(__dirname + '/html/home.html'), {id: req.session.user});
         }
         else{
           res.redirect('login?loginError'); //invalid credentials
@@ -66,14 +62,11 @@ router.use('/home', function(req, res, next){
     });
 });
 
-router.post('/home', function(req, res){
-   res.sendFile(path.join(__dirname + '/html/home.html'));
-});
+router.use('/getAccounts', isValidUser, function(req, res, next){
 
-router.get('/getAccounts', function(req, res){
   var query = "SELECT a.name, a.amount from account a ";
-  query = query + "INNER JOIN users u ON u.iduser = a.iduser WHERE a.iduser = 1";
-
+  query = query + "INNER JOIN users u ON u.iduser = a.iduser WHERE a.iduser = ";
+  query = query + req.session.user;
   con.query(query,
     function (err, result, fields) {
       if(err){
@@ -86,6 +79,14 @@ router.get('/getAccounts', function(req, res){
     });
 });
 
-
-
+function isValidUser(req, res, next){
+   if(req.session.user){
+      next();
+   }
+   else{
+      var err = new Error("You aren't logged in!");
+      console.log('session error');
+      res.redirect('login');
+   }
+}
 module.exports = router;

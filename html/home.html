@@ -187,7 +187,7 @@ function getAccounts(){
         $('#totalBalance').empty().append('<b> Total Balance: $'+totalAmount.toLocaleString('en-IN', { maximumSignificantDigits: 3 })+'</b>')
       },
       error: function(error){
-        alert(error);
+        alert("Error: " + error);
       }
   });
 }

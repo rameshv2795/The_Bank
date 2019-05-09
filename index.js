@@ -1,6 +1,5 @@
 var express = require('express');
 var app = express();
-var router = require('./show.js');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');

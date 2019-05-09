@@ -29,6 +29,8 @@ body {font-size:16px;}
     <a href="#designers" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Designers</a>
     <a href="#packages" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Packages</a>
     <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Contact</a>
+    <br><br><br><br>
+    <a href="logout" class="w3-bar-item w3-button w3-hover-white">Logout</a>
   </div>
 </nav>
 
@@ -166,13 +168,13 @@ function getAccounts(){
             accountType = 'Savings';
           }
           $('.w3-row-padding').append(
-            '<div class="w3-half w3-margin-bottom">' +
+            '<div id=T'+ data[i].idaccount +' class="w3-half w3-margin-bottom">' +
               '<ul class="w3-ul w3-light-grey w3-center">' +
               '  <li class="w3-'+ accountColor +' w3-xlarge w3-padding-32">'+accountType+': $'+amount+'</li>'+
-                '<li class="w3-padding-16"> 9932 deposit <span style="color:green">  +  $43 </span></li>' +
-              '  <li class="w3-padding-16"> kvi3 deposit <span style="color:green">  +  $283 </span> </li>' +
-              '  <li class="w3-padding-16"> xdia transfe <span style="color:purple">  -  $2 </span> </li>' +
-              '  <li class="w3-padding-16">' +
+                '<li class="w3-padding-16"  data-t = "0"> 9932 deposit <span style="color:green">  +  $43 </span></li>' +
+              '  <li class="w3-padding-16" data-t = "1"> kvi3 deposit <span style="color:green">  +  $283 </span> </li>' +
+              '  <li class="w3-padding-16" data-t = "2"> xdia transfe <span style="color:purple">  -  $2 </span> </li>' +
+              '  <li class="w3-padding-16" data-t = "total">' +
               '    <h2 style="color:green">$324</h2> '+
               '    <span class="w3-opacity">this month</span>' +
             '    </li>' +
@@ -182,6 +184,7 @@ function getAccounts(){
             '  </ul>' +
           '  </div>'
           );
+          getTransactions(data[i].idaccount); //ugly callback
         }
 
         $('#totalBalance').empty().append('<b> Total Balance: $'+totalAmount.toLocaleString('en-IN', { maximumSignificantDigits: 3 })+'</b>')
@@ -190,6 +193,39 @@ function getAccounts(){
         alert("Error: " + error);
       }
   });
+
+  function getTransactions(accountId){
+    console.log("accountId: "+ accountId)
+    var jsonAccountId = JSON.stringify({id : accountId});
+    $.ajax({
+      url: "getTransactions",
+      type: "POST",
+      datatype: "json",
+      headers: { "Content-Type": "application/json"},
+      data: jsonAccountId,
+      success: function(data){
+        var threeTotal = 0;
+        var totalColor = "green";
+        for(var i = 0; i < data.length; i++){
+          threeTotal = threeTotal + data[i].amount;
+          $("#T"+accountId+" .w3-ul").find("[data-t='"+i+"']").empty().append(data[i].name+'<span style="color:green">  +  $43 </span>');
+        }
+        if(threeTotal < 0){
+          totalColor = "red";
+        }
+        else if(threeTotal === 0){
+          totalColor = "black";
+        }
+        $("#T"+accountId+" .w3-ul").find("[data-t='total']").empty().append(
+          "<h2 style='color:"+totalColor+"'> $"+threeTotal.toLocaleString('en-IN', { maximumSignificantDigits: 3 }) +
+          "</h2> <span class='w3-opacity'>most recent</span>"
+        );
+      },
+      error: function(err){
+        console.log("Error: " + err);
+      }
+    });
+  }
 }
 </script>
 

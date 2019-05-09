@@ -4,7 +4,7 @@ var router = require('./show.js');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-var router = require('./show.js');
+var router = require('./routes/show.js');
 
 //To parse URL encoded data (tutorialspoint.com)
 app.use(bodyParser.urlencoded({ extended: false }))

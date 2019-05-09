@@ -4,9 +4,11 @@ var router = express.Router();
 var path = require('path');
 var con = require('../config/db.js');
 
+/*routes*/
 var loginR  = require('./loginRoute.js');
 var homeR  = require('./homeRoute.js');
-
+var transactionsR = require('./transactionsRoute.js')
+var getAccountsR = require('./getAccountsRoute.js')
 
 con.connect(function(err) {
   if (err) throw err;
@@ -25,42 +27,9 @@ router.use('/login', loginR.useLogin);
 
 router.use('/home', homeR.useHome);
 
-router.use('/getAccounts', isValidUser, function(req, res, next){
+router.use('/getAccounts', isValidUser, getAccountsR.useGetAccounts);
 
-  var query = "SELECT a.idaccount, a.name, a.amount from account a ";
-  query = query + "INNER JOIN users u ON u.iduser = a.iduser WHERE a.iduser = ";
-  query = query + req.session.user;
-  //console.log(query);
-  con.query(query,
-    function (err, result, fields) {
-      if(err){
-        throw err;
-      }
-      else{
-        //console.log(result);
-        res.send(result);
-      }
-    });
-});
-
-router.use('/getTransactions', isValidUser, function(req, res, next){
-
-  var query = "SELECT * from transactions ";
-  query = query + "WHERE idaccount = ";
-  query = query + req.body.id;
-  query = query + " ORDER BY created DESC LIMIT 3"
-  console.log(query);
-  con.query(query,
-    function (err, result, fields) {
-      if(err){
-        throw err;
-      }
-      else{
-        console.log("transac: "+ result);
-        res.send(result);
-      }
-    });
-});
+router.use('/getTransactions', isValidUser, transactionsR.useTransactions);
 
 router.use('/logout', function(req, res){
   req.session.destroy(function(){

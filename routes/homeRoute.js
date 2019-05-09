@@ -7,9 +7,9 @@ module.exports = {
       var password = req.body.password;
 
       var query = "SELECT COUNT(idUser) AS exist, username, password, firstName, iduser FROM users";
-      query = query + " WHERE username = '"+username + "' AND password = '" + password + "'";
+      query = query + " WHERE username = ? AND password = ?";
 
-      con.query(query,
+      con.query(query, [username, password],
         function (err, result, fields) {
           if(err){
             throw err;

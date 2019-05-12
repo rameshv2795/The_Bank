@@ -50,48 +50,30 @@ body {font-size:16px;}
     <h1 class="w3-jumbo"><b>Welcome System!</b></h1>
   </div>
 
-  <!-- Packages / Pricing Tables -->
-
   <div class="w3-container" id="packages" style="margin-top:75px">
     <h1 id="totalBalance" onloadedmetadata=""class="w3-xxxlarge w3-text-red"><b>Total Balance: </b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
   </div>
 
   <div class="w3-row-padding">
-<!--
-    <div class="w3-half w3-margin-bottom">
-      <ul class="w3-ul w3-light-grey w3-center">
-        <li class="w3-dark-grey w3-xlarge w3-padding-32">Checking: $58,392</li>
-        <li class="w3-padding-16">Floorplanning</li>
-        <li class="w3-padding-16">10 hours support</li>
-        <li class="w3-padding-16">Photography</li>
-        <li class="w3-padding-16">
-          <h2>$ 199</h2>
-          <span class="w3-opacity">per room</span>
-        </li>
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-white w3-padding-large w3-hover-black">Detailed View</button>
-        </li>
-      </ul>
-    </div>
+    <template id="accountTemplateId">
 
-    <div class="w3-half">
-      <ul class="w3-ul w3-light-grey w3-center">
-        <li class="w3-red w3-xlarge w3-padding-32">Saving: $92,940</li>
-        <li class="w3-padding-16">Floorplanning</li>
-        <li class="w3-padding-16">50 hours support</li>
-        <li class="w3-padding-16">Photography</li>
-          <h2>$ 249</h2>
-          <span class="w3-opacity">per room</span>
-        </li>
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-red w3-padding-large w3-hover-black">Detailed View</button>
-        </li>
-      </ul>
-    </div>
-    -->
+        <ul class="w3-ul w3-light-grey w3-center">
+          <li class="w3-red w3-xlarge w3-padding-32">'+accountType+': $'+amount+'</li>
+          <li class="w3-padding-16"  data-t = "0"> name <span style="">  amount </span></li>
+          <li class="w3-padding-16" data-t = "1"> name <span style="">  amount</span> </li>
+          <li class="w3-padding-16" data-t = "2"> name <span style="">  amount </span> </li>
+          <li class="w3-padding-16" data-t = "total">
+            <h2 style="color:green">$324</h2>
+           <span class="w3-opacity">this month</span>
+          </li>
+           <li class="w3-light-grey w3-padding-24">
+              <button class="w3-button w3-white w3-padding-large w3-hover-black">Detailed View</button>
+          </li>
+       </ul>
 
-  </div>
+  </template>
+</div>
 
   <!-- Contact -->
   <div class="w3-container" id="contact" style="margin-top:75px">
@@ -116,7 +98,6 @@ body {font-size:16px;}
   </div>
 
 <!-- End page content -->
-</div>
 
 <!-- W3.CSS Container -->
 <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
@@ -167,23 +148,16 @@ function getAccounts(){
             accountColor = 'red';
             accountType = 'Savings';
           }
-          $('.w3-row-padding').append(
-            '<div id=T'+ data[i].idaccount +' class="w3-half w3-margin-bottom">' +
-              '<ul class="w3-ul w3-light-grey w3-center">' +
-              '  <li class="w3-'+ accountColor +' w3-xlarge w3-padding-32">'+accountType+': $'+amount+'</li>'+
-                '<li class="w3-padding-16"  data-t = "0"> 9932 deposit <span style="color:green">  +  $43 </span></li>' +
-              '  <li class="w3-padding-16" data-t = "1"> kvi3 deposit <span style="color:green">  +  $283 </span> </li>' +
-              '  <li class="w3-padding-16" data-t = "2"> xdia transfe <span style="color:purple">  -  $2 </span> </li>' +
-              '  <li class="w3-padding-16" data-t = "total">' +
-              '    <h2 style="color:green">$324</h2> '+
-              '    <span class="w3-opacity">this month</span>' +
-            '    </li>' +
-            '    <li class="w3-light-grey w3-padding-24">' +
-            '      <button class="w3-button w3-white w3-padding-large w3-hover-black">Detailed View</button> ' +
-              '  </li>' +
-            '  </ul>' +
-          '  </div>'
-          );
+
+          var accountTemp = $("#accountTemplateId").clone().prop("content");
+          var accountNew = document.createElement("div");
+          accountNew.id = 'T'+ data[i].idaccount;
+          accountNew.className = "w3-half w3-margin-bottom";
+          accountNew.appendChild(accountTemp);
+          $(".w3-row-padding").append(accountNew);
+          $("#"+accountNew.id).find("li").first().attr("class","w3-"+accountColor+"  w3-xlarge w3-padding-32");
+          $("#"+accountNew.id).find("li").first().html(accountType + ": $"+amount);
+
           getTransactions(data[i].idaccount); //ugly callback
         }
 
